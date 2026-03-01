@@ -1,54 +1,41 @@
 # GA4GH MCP Servers
 
-This repository provides example MCP (Model Context Protocol) servers for GA4GH endpoints.
+This repository provides a collection of  MCP (Model Context Protocol) servers that enable AI assistants like Claude, Cursor, and Codex to directly execute against GA4GH API endpoints. Each server wraps a specific GA4GH API, providing a standardized interface for AI-driven analysis.
 
-Quick contents
-- ga4gh_registry (GA4GH Service Registry) — run the module that exposes tools to list/query services
-- ga4gh_trs (TRS) — run the TRS server that exposes tools to list/query tools, versions, descriptors
 
-Prerequisites
+## Purpose
+
+GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excels at designing workflows and interpreting results, GA4GH-MCP handles the technical execution, allowing you to focus on the science rather than the command-line details.
+
+## Available MCP Servers
+
+- **ga4gh-registry** - provides access to the GA4GH Service Registry, allowing you to discover and query GA4GH services including TRS (Tool Registry Service), WES, and other standardized services.
+
+- **ga4gh-trs** - rovides direct access to GA4GH Tool Registry Service (TRS) endpoints, allowing you to discover and query tools, workflows, and their metadata.
+
+
+## Prerequisites
+
 - Python 3.10+
-- Install runtime deps in the interpreter that will run the servers:
-  pip install httpx mcp
+- [uv](https://github.com/astral-sh/uv) - fast Python package manager and runner
+  ```bash
+  # Install uv if you haven't already
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
 
-Start servers (examples)
+## Running the servers
 
-1) Run directly with Python (project dir = this repo)
+1) Run directly with uv from project root
 ```bash
-# run GA4GH registry server (if you have ga4gh_registry.py)
-python -m ga4gh_registry
+# run GA4GH registry server
+uv run --directory ga4gh-mcp/servers -- python -m ga4gh_registry.py
 
 # run TRS server
-python -m ga4gh_trs
-
-# alternatively run files directly
-python ga4gh_trs.py
+uv run --directory ga4gh-mcp/servers -- python -m ga4gh_trs.py
 ```
 
-2) Use uv (if you use uv/env tooling)
-```bash
-# run from repo root using uv, forwarding a python -m command
-uv --directory /Users/Venkat/OpenSource/GA4GH/ga4gh-mcp run -- python -m ga4gh_trs
-```
 
-3) Use mcp-cli to run servers from a toml config
-```toml
-# example mcp.toml
-[trs]
-command = "python"
-args = ["-m", "ga4gh_trs"]
-
-[ga4gh-registry]
-command = "python"
-args = ["-m", "ga4gh_registry"]
-```
-
-Run:
-```bash
-mcp run -c /path/to/mcp.toml
-```
-
-Testing the server
+## Testing the server
 
 - List available tools:
 Send this JSON-RPC to the running process (method `tools/list`):
@@ -67,26 +54,40 @@ echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"list_tools
   | python -m ga4gh_trs
 ```
 
-Claude Desktop / MCP integration
-- Ensure the process Claude spawns can import the module and has deps installed.
-- Example claude_desktop_config.json entry (use full uv or python path to match your environment):
+## Claude Desktop / MCP integration
+
+1. Ensure uv is installed on your system
+2. Example `claude_desktop_config.json` entry:
 ```json
-"trs": {
+"ga4gh-registry": {
   "command": "uv",
-    "args": [
-        "--directory",
-        "gagh-mcp",
-        "run",
-        "ga4gh_registry.py"
-    ]
+  "args": [
+    "--directory",
+    "ga4gh-mcp/server",
+    "run",
+    "ga4gh_registry.py"
+  ]
+},
+"ga4gh-trs": {
+  "command": "uv",
+  "args": [
+     "--directory",
+    "ga4gh-mcp/server",
+    "run",
+    "ga4gh_trs.py"
+  ]
 }
-```
 
-Troubleshooting
-- ModuleNotFoundError: install missing packages in the interpreter Claude/uv uses (pip install httpx mcp).
-- If the server exits immediately, run the same command in a terminal to see stderr and fix import errors.
-- Use `mcp-cli` for easier local testing and interactive calls.
+3. Restart Claude Desktop (or use Help → Reload configuration)
+4. Servers should now appear in the Tools/Plugins list
 
+
+## Troubleshooting
+
+- `command not found: uv` - Install uv using the link above
+- Module import errors - uv will automatically install dependencies from `pyproject.toml` or `requirements.txt`
+- Server exits immediately - Run the same uv command in your terminal to see stderr and diagnose import/runtime errors
+- Use `mcp-cli` for easier local testing and interactive calls
 
 ## Example queries (convenience tools)
 
@@ -124,7 +125,14 @@ The GA4GH registry server exposes convenience tools for common queries. Use mcp-
 
 Note: Ensure the ga4gh-registry server is running and accessible to mcp or Claude Desktop. These tools are implemented in `ga4gh_registry.py`.
 
-License / Links
+## License / Links
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 - See GA4GH Service Registry and TRS specs for API details:
   - https://github.com/ga4gh-discovery/ga4gh-service-registry
   - https://github.com/ga4gh/tool-registry-service-schemas
+
+## AI Disclosure
+
+Artificial intelligence tools, including large language models (LLMs), were used during the development of this project to support writing, clarify technical concepts, and assist in generating code snippets. These tools served as an aid for idea refinement, debugging, and improving the readability of explanations and documentation. All AI-generated text and code were thoroughly reviewed, verified for correctness, and understood in full before being incorporated into this work. The responsibility for all final decisions, interpretations, and implementations remains solely with the contributors.
