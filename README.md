@@ -101,6 +101,7 @@ This is the recommended approach for iterative development: make a change, resta
     "ga4gh_trs.py"
   ]
 }
+```
 
 3. Restart Claude Desktop (or use Help → Reload configuration)
 4. Servers should now appear in the Tools/Plugins list
@@ -124,13 +125,18 @@ AI: [calls ga4gh-registry] -> Returns summary table of GA4GH servies registered
 
 ```
 User: "Give me all the information on the Dockstore TRS service"
-AI: [calls ga4gh-registry] -> Returns Dockstore Service info -> [calls ga4gh-trs] -> Retrus TRS service Info -> Summary table of From GA$GH registry and live TRS endpoint
+AI: [calls ga4gh-registry] -> Returns Dockstore Service info -> [calls ga4gh-trs] -> Returns TRS service Info -> Summary table of From GA$GH registry and live TRS endpoint
 ```
 
 
 ```
 User: "Give me a summary of samtools versions from Biocontainers"
 AI: [calls ga4gh-trs] -> Returns Bioconstainers list of all avaiable Samtools versions and hilighting the latest version as well as duplicate/conflicting version numbers.
+```
+
+```
+User: "Get me a list of RNAseq workflows from dockstore and group by language"
+AI: [calls ga4gh-trs] -> Search using terms RNA-seq and aliases -> Returns table of workflows matching search pattern broken up by workflow language and given number of versions for each
 ```
 
 ## Available Tools
