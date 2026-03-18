@@ -23,36 +23,60 @@ GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excel
   curl -LsSf https://astral.sh/uv/install.sh | sh
   ```
 
+## Setup
+
+1. Create and activate a virtual environment
+```bash
+   uv venv
+   source .venv/bin/activate
+```
+
+2. Install dependencies
+```bash
+   uv add "mcp[cli]" httpx
+```
+
+3. Install nvm if you don't have it
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Restart terminal then install and use Node 20
+nvm install 20
+nvm use 20
+```
+
 ## Running the servers
 
 1) Run directly with uv from project root
 ```bash
 # run GA4GH registry server
-uv run --directory ga4gh-mcp/servers -- python -m ga4gh_registry.py
+uv run --directory servers -- python -m ga4gh_registry
 
 # run TRS server
-uv run --directory ga4gh-mcp/servers -- python -m ga4gh_trs.py
+uv run --directory servers -- python -m ga4gh_trs.py
 ```
 
 
 ## Testing the server
 
-- List available tools:
-Send this JSON-RPC to the running process (method `tools/list`):
-```json
-{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}
-```
+The easiest way to test and debug the servers is with the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) — an interactive tool that runs directly via `npx` with no installation required.
 
-- Call a tool (method `tools/call`):
-```json
-{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"list_tools","args":{"registry_url":"https://dockstore.org/api/ga4gh/trs/v2"}}}
-```
-
-Quick `echo | python` test
+Launch the inspector against a locally installed server:
 ```bash
-echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"list_tools","args":{"registry_url":"https://dockstore.org/api/ga4gh/trs/v2"}}}' \
-  | python -m ga4gh_trs
+# GA4GH Registry server
+npx @modelcontextprotocol/inspector uv --directory . run fairbio-ga4gh-registry
+
+# TRS server
+npx @modelcontextprotocol/inspector uv --directory . run fairbio-trs
 ```
+
+Once running, the Inspector opens a browser UI where you can:
+
+- **Tools tab** — browse available tools, view their schemas, and invoke them with custom inputs
+- **Resources tab** — inspect any exposed resources and their metadata
+- **Notifications pane** — view logs and server-emitted notifications in real time
+
+This is the recommended approach for iterative development: make a change, restart the server, reconnect the Inspector, and test the affected tools.
 
 ## Claude Desktop / MCP integration
 
@@ -87,43 +111,57 @@ echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"list_tools
 - `command not found: uv` - Install uv using the link above
 - Module import errors - uv will automatically install dependencies from `pyproject.toml` or `requirements.txt`
 - Server exits immediately - Run the same uv command in your terminal to see stderr and diagnose import/runtime errors
-- Use `mcp-cli` for easier local testing and interactive calls
+- Use `mcp-cli` or `MCP Inspector` for easier local testing and interactive calls
 
 ## Example queries (convenience tools)
 
-The GA4GH registry server exposes convenience tools for common queries. Use mcp-cli or JSON‑RPC to call them.
+The GA4GH registry server exposes convenience tools for common queries. 
 
-- Give me a list of all services in the GA4GH registry
-  - mcp-cli:
-    ```bash
-    mcp call list_all_services -s ga4gh-registry -c /Users/Venkat/OpenSource/GA4GH/ga4gh-mcp/mcp.toml
-    ```
-  - JSON-RPC:
-    ```json
-    {"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_all_services","args":{}}}
-    ```
+```
+User: "Give me a list of all services in the GA4GH registry"
+AI: [calls ga4gh-registry] -> Returns summary table of GA4GH servies registered
+```
 
-- Give me all the information on the Dockstore TRS service
-  - mcp-cli:
-    ```bash
-    mcp call dockstore_trs_info -s ga4gh-registry -c /Users/Venkat/OpenSource/GA4GH/ga4gh-mcp/mcp.toml
-    ```
-  - JSON-RPC:
-    ```json
-    {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"dockstore_trs_info","args":{}}}
-    ```
+```
+User: "Give me all the information on the Dockstore TRS service"
+AI: [calls ga4gh-registry] -> Returns Dockstore Service info -> [calls ga4gh-trs] -> Retrus TRS service Info -> Summary table of From GA$GH registry and live TRS endpoint
+```
 
-- Give me a summary of samtools versions from Dockstore
-  - mcp-cli:
-    ```bash
-    mcp call summarize_samtools_versions_from_dockstore -s ga4gh-registry -c /Users/Venkat/OpenSource/GA4GH/ga4gh-mcp/mcp.toml
-    ```
-  - JSON-RPC:
-    ```json
-    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"summarize_samtools_versions_from_dockstore","args":{}}}
-    ```
 
-Note: Ensure the ga4gh-registry server is running and accessible to mcp or Claude Desktop. These tools are implemented in `ga4gh_registry.py`.
+```
+User: "Give me a summary of samtools versions from Biocontainers"
+AI: [calls ga4gh-trs] -> Returns Bioconstainers list of all avaiable Samtools versions and hilighting the latest version as well as duplicate/conflicting version numbers.
+```
+
+## Available Tools
+
+### ga4gh-registry
+
+Provides access to the GA4GH Service Registry for discovering and querying registered GA4GH services.
+
+| Tool | Description |
+|---|---|
+| `list_services` | List all services, optionally filtered by type (`trs`, `wes`, `tes`, `drs`, etc.) |
+| `get_service` | Get full details for a specific service by ID |
+| `list_service_types` | List all distinct service types present in the registry |
+| `get_registry_info` | Get metadata about the registry itself |
+
+All tools accept an optional `registry_url` parameter to target a custom registry (defaults to `https://registry.ga4gh.org/v1`).
+
+### ga4gh-trs
+
+Provides direct access to any GA4GH Tool Registry Service (TRS) endpoint for discovering tools, workflows, and their metadata.
+
+| Tool | Description |
+|---|---|
+| `get_trs_info` | Get service metadata for a TRS instance |
+| `list_tools` | List tools in a TRS registry, with pagination support |
+| `get_tool` | Get details for a specific tool by ID |
+| `list_tool_versions` | List all versions of a tool |
+| `get_tool_descriptor` | Fetch a tool descriptor (CWL, WDL, NFL, GALAXY, SMK, etc.) for a specific version |
+| `list_tool_classes` | List all tool classes available in the TRS |
+
+All tools require a `registry_url` argument (e.g. `https://dockstore.org/api/ga4gh/trs/v2` or `https://api.biocontainers.pro/ga4gh/trs/v2`).
 
 ## License / Links
 
