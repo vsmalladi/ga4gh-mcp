@@ -1,7 +1,6 @@
 # GA4GH MCP Servers
 
-This repository provides a collection of  MCP (Model Context Protocol) servers that enable AI assistants like Claude, Cursor, and Codex to directly execute against GA4GH API endpoints. Each server wraps a specific GA4GH API, providing a standardized interface for AI-driven analysis.
-
+A collection of Model Context Protocol (MCP) servers for GA4GH (Global Alliance for Genomics and Health) genomic data standards and tools. These servers enable AI agents and applications to discover, query, and access genomic reference data through a standardized interface.
 
 ## Purpose
 
@@ -9,9 +8,13 @@ GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excel
 
 ## Available MCP Servers
 
-- **ga4gh-registry** - provides access to the GA4GH Service Registry, allowing you to discover and query GA4GH services including TRS (Tool Registry Service), WES, and other standardized services.
+- **ga4gh-registry** - Provides access to the GA4GH Service Registry, allowing you to discover and query GA4GH services including TRS (Tool Registry Service), WES, and other standardized services.
 
-- **ga4gh-trs** - rovides direct access to GA4GH Tool Registry Service (TRS) endpoints, allowing you to discover and query tools, workflows, and their metadata.
+- **ga4gh-trs** - Provides direct access to GA4GH Tool Registry Service (TRS) endpoints, allowing you to discover and query tools, workflows, and their metadata.
+
+- **ga4gh-refget** - Retrieve and validate biological sequences and collections via GA4GH refget APIs. Supports digest computation, sequence lookup, and FASTA ingestion.
+
+- **refgenie** - Discover and access reference genome assets and annotations.
 
 
 ## Prerequisites
@@ -54,6 +57,13 @@ uv run --directory servers -- python -m ga4gh_registry
 
 # run TRS server
 uv run --directory servers -- python -m ga4gh_trs.py
+
+# run Refget server
+uv run --directory servers -- python -m ga4gh_refget.py
+
+# run Refgenie server
+uv run --directory servers -- python -m refgenie.py
+
 ```
 
 
@@ -68,6 +78,12 @@ npx @modelcontextprotocol/inspector uv --directory . run fairbio-ga4gh-registry
 
 # TRS server
 npx @modelcontextprotocol/inspector uv --directory . run fairbio-trs
+
+# Refget server
+npx @modelcontextprotocol/inspector uv --directory . run fairbio-refget
+
+# Refgenie server
+npx @modelcontextprotocol/inspector uv --directory . run fairbio-refgenie
 ```
 
 Once running, the Inspector opens a browser UI where you can:
@@ -100,7 +116,25 @@ This is the recommended approach for iterative development: make a change, resta
     "run",
     "ga4gh_trs.py"
   ]
-}
+},
+"ga4gh-refget": {
+  "command": "uv",
+  "args": [
+     "--directory",
+    "ga4gh-mcp/server",
+    "run",
+    "ga4gh_refget.py"
+  ]
+},
+"refgenie": {
+  "command": "uv",
+  "args": [
+     "--directory",
+    "ga4gh-mcp/server",
+    "run",
+    "refgenie.py"
+  ]
+},
 ```
 
 3. Restart Claude Desktop (or use Help → Reload configuration)
@@ -139,6 +173,17 @@ User: "Get me a list of RNAseq workflows from dockstore and group by language"
 AI: [calls ga4gh-trs] -> Search using terms RNA-seq and aliases -> Returns table of workflows matching search pattern broken up by workflow language and given number of versions for each
 ```
 
+```
+User: "Fetch sequence for this GA4GH digest"
+AI: [calls ga4gh-refget] -> 
+```
+
+```
+User: "Find Human Reference Sequence"
+AI: [calls refgenie] -> Search for all Human assets using aliases -> Returns a list of human references assets 
+```
+
+
 ## Available Tools
 
 ### ga4gh-registry
@@ -169,13 +214,50 @@ Provides direct access to any GA4GH Tool Registry Service (TRS) endpoint for dis
 
 All tools require a `registry_url` argument (e.g. `https://dockstore.org/api/ga4gh/trs/v2` or `https://api.biocontainers.pro/ga4gh/trs/v2`).
 
+### ga4gh-refget
+
+Provides direct access to any GA4GH Refget endpoint discovering genomes.
+
+| Tool                     | Description                      |
+| ------------------------ | -------------------------------- |
+| `refget_search`          | Search collections               |
+| `refget_get_collection`  | Fetch collection metadata        |
+| `refget_get_sequence`    | Retrieve sequence by digest      |
+| `refget_upload_fasta`    | Upload FASTA and compute digests |
+| `refget_verify_sequence` | Validate sequence vs digest      |
+
+
+### refgenie
+
+Discover and access reference genome assets and annotations from the refgenie database.
+
+| Tool | Description |
+|---|---|
+| `refgenie_set_url` | Configure refgenie server URL dynamically |
+| `refgenie_get_url` | Check current server configuration and status |
+| `refgenie_list_genomes` | List all available genomes, optionally filtered by organism |
+| `refgenie_get_genome` | Get detailed information about a specific genome |
+| `refgenie_get_genome_digest` | Get the GA4GH sequence digest for a genome |
+| `refgenie_list_assets` | List all available assets for a specific genome |
+| `refgenie_get_asset` | Get detailed information about a specific genome asset |
+| `refgenie_search_assets` | Find all genomes that have a specific asset type |
+| `refgenie_get_asset_path` | Get the download or access path for an asset (HTTP, S3, GCS, etc.) |
+| `refgenie_get_available_remotes` | List available remote storage systems on the server |
+| `refgenie_get_server_summary` | Get overall server statistics and information |
+| `refgenie_get_organism_genomes` | Get all genomes available for a specific organism |
+| `refgenie_compare_genomes` | Compare available assets between two genomes |
+
+
 ## License / Links
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- See GA4GH Service Registry and TRS specs for API details:
+- See GA4GH Specs:
   - https://github.com/ga4gh-discovery/ga4gh-service-registry
   - https://github.com/ga4gh/tool-registry-service-schemas
+  - https://github.com/ga4gh/refget
+
+- Refgenie: https://refgenie.databio.org
 
 ## AI Disclosure
 
