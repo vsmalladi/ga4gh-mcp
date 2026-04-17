@@ -16,11 +16,11 @@ GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excel
 
 - **refgenie** - Discover and access reference genome assets and annotations.
 
-
 ## Prerequisites
 
 - Python 3.10+
 - [uv](https://github.com/astral-sh/uv) - fast Python package manager and runner
+
   ```bash
   # Install uv if you haven't already
   curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -29,18 +29,21 @@ GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excel
 ## Setup
 
 1. Create and activate a virtual environment
+
 ```bash
    uv venv
    source .venv/bin/activate
 ```
 
-2. Install dependencies
+1. Install dependencies
+
 ```bash
    uv add "mcp[cli]" httpx
 ```
 
-3. Install nvm if you don't have it
-```
+1. Install nvm if you don't have it
+
+```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
 # Restart terminal then install and use Node 20
@@ -51,6 +54,7 @@ nvm use 20
 ## Running the servers
 
 1) Run directly with uv from project root
+
 ```bash
 # run GA4GH registry server
 uv run --directory servers -- python -m ga4gh_registry
@@ -66,12 +70,12 @@ uv run --directory servers -- python -m refgenie.py
 
 ```
 
-
 ## Testing the server
 
 The easiest way to test and debug the servers is with the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) — an interactive tool that runs directly via `npx` with no installation required.
 
 Launch the inspector against a locally installed server:
+
 ```bash
 # GA4GH Registry server
 npx @modelcontextprotocol/inspector uv --directory . run fairbio-ga4gh-registry
@@ -98,12 +102,13 @@ This is the recommended approach for iterative development: make a change, resta
 
 1. Ensure uv is installed on your system
 2. Example `claude_desktop_config.json` entry:
+
 ```json
 "ga4gh-registry": {
   "command": "uv",
   "args": [
     "--directory",
-    "ga4gh-mcp/server",
+    "ga4gh-mcp/servers",
     "run",
     "ga4gh_registry.py"
   ]
@@ -112,7 +117,7 @@ This is the recommended approach for iterative development: make a change, resta
   "command": "uv",
   "args": [
      "--directory",
-    "ga4gh-mcp/server",
+    "ga4gh-mcp/servers",
     "run",
     "ga4gh_trs.py"
   ]
@@ -121,7 +126,7 @@ This is the recommended approach for iterative development: make a change, resta
   "command": "uv",
   "args": [
      "--directory",
-    "ga4gh-mcp/server",
+    "ga4gh-mcp/servers",
     "run",
     "ga4gh_refget.py"
   ]
@@ -130,16 +135,15 @@ This is the recommended approach for iterative development: make a change, resta
   "command": "uv",
   "args": [
      "--directory",
-    "ga4gh-mcp/server",
+    "ga4gh-mcp/servers",
     "run",
     "refgenie.py"
   ]
 },
 ```
 
-3. Restart Claude Desktop (or use Help → Reload configuration)
-4. Servers should now appear in the Tools/Plugins list
-
+1. Restart Claude Desktop (or use Help → Reload configuration)
+2. Servers should now appear in the Tools/Plugins list
 
 ## Troubleshooting
 
@@ -150,39 +154,37 @@ This is the recommended approach for iterative development: make a change, resta
 
 ## Example queries (convenience tools)
 
-The GA4GH registry server exposes convenience tools for common queries. 
+The GA4GH registry server exposes convenience tools for common queries.
 
-```
+```text
 User: "Give me a list of all services in the GA4GH registry"
 AI: [calls ga4gh-registry] -> Returns summary table of GA4GH servies registered
 ```
 
-```
+```text
 User: "Give me all the information on the Dockstore TRS service"
 AI: [calls ga4gh-registry] -> Returns Dockstore Service info -> [calls ga4gh-trs] -> Returns TRS service Info -> Summary table of From GA$GH registry and live TRS endpoint
 ```
 
-
-```
+```text
 User: "Give me a summary of samtools versions from Biocontainers"
 AI: [calls ga4gh-trs] -> Returns Bioconstainers list of all avaiable Samtools versions and hilighting the latest version as well as duplicate/conflicting version numbers.
 ```
 
-```
+```text
 User: "Get me a list of RNAseq workflows from dockstore and group by language"
 AI: [calls ga4gh-trs] -> Search using terms RNA-seq and aliases -> Returns table of workflows matching search pattern broken up by workflow language and given number of versions for each
 ```
 
-```
+```text
 User: "Fetch sequence for this GA4GH digest"
 AI: [calls ga4gh-refget] -> 
 ```
 
-```
+```text
 User: "Find Human Reference Sequence"
 AI: [calls refgenie] -> Search for all Human assets using aliases -> Returns a list of human references assets 
 ```
-
 
 ## Available Tools
 
@@ -191,7 +193,7 @@ AI: [calls refgenie] -> Search for all Human assets using aliases -> Returns a l
 Provides access to the GA4GH Service Registry for discovering and querying registered GA4GH services.
 
 | Tool | Description |
-|---|---|
+| --- | --- |
 | `list_services` | List all services, optionally filtered by type (`trs`, `wes`, `tes`, `drs`, etc.) |
 | `get_service` | Get full details for a specific service by ID |
 | `list_service_types` | List all distinct service types present in the registry |
@@ -204,7 +206,7 @@ All tools accept an optional `registry_url` parameter to target a custom registr
 Provides direct access to any GA4GH Tool Registry Service (TRS) endpoint for discovering tools, workflows, and their metadata.
 
 | Tool | Description |
-|---|---|
+| --- | --- |
 | `get_trs_info` | Get service metadata for a TRS instance |
 | `list_tools` | List tools in a TRS registry, with pagination support |
 | `get_tool` | Get details for a specific tool by ID |
@@ -226,13 +228,12 @@ Provides direct access to any GA4GH Refget endpoint discovering genomes.
 | `refget_upload_fasta`    | Upload FASTA and compute digests |
 | `refget_verify_sequence` | Validate sequence vs digest      |
 
-
 ### refgenie
 
 Discover and access reference genome assets and annotations from the refgenie database.
 
 | Tool | Description |
-|---|---|
+| --- | --- |
 | `refgenie_set_url` | Configure refgenie server URL dynamically |
 | `refgenie_get_url` | Check current server configuration and status |
 | `refgenie_list_genomes` | List all available genomes, optionally filtered by organism |
@@ -247,17 +248,16 @@ Discover and access reference genome assets and annotations from the refgenie da
 | `refgenie_get_organism_genomes` | Get all genomes available for a specific organism |
 | `refgenie_compare_genomes` | Compare available assets between two genomes |
 
-
 ## License / Links
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 - See GA4GH Specs:
-  - https://github.com/ga4gh-discovery/ga4gh-service-registry
-  - https://github.com/ga4gh/tool-registry-service-schemas
-  - https://github.com/ga4gh/refget
+  - <https://github.com/ga4gh-discovery/ga4gh-service-registry>
+  - <https://github.com/ga4gh/tool-registry-service-schemas>
+  - <https://github.com/ga4gh/refget>
 
-- Refgenie: https://refgenie.databio.org
+- Refgenie: <https://refgenie.databio.org>
 
 ## AI Disclosure
 
