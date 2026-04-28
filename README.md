@@ -74,16 +74,16 @@ The easiest way to test and debug the servers is with the [MCP Inspector](https:
 Launch the inspector against a locally installed server:
 ```bash
 # GA4GH Registry server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-ga4gh-registry
+npx @modelcontextprotocol/inspector uv --directory . run ga4gh_registry.py
 
 # TRS server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-trs
+npx @modelcontextprotocol/inspector uv --directory . run ga4gh_trs.py
 
 # Refget server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-refget
+npx @modelcontextprotocol/inspector uv --directory . run ga4gh_refget.py
 
 # Refgenie server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-refgenie
+npx @modelcontextprotocol/inspector uv --directory . run refgenie.py
 ```
 
 Once running, the Inspector opens a browser UI where you can:
@@ -180,7 +180,7 @@ AI: [calls ga4gh-refget] ->
 
 ```
 User: "Find Human Reference Sequence"
-AI: [calls refgenie] -> Search for all Human assets using aliases -> Returns a list of human references assets 
+AI: [calls refgenie] -> Search for all Human assets using aliases -> Returns a list of human references assets by id that match aliases 
 ```
 
 
@@ -235,17 +235,12 @@ Discover and access reference genome assets and annotations from the refgenie da
 |---|---|
 | `refgenie_set_url` | Configure refgenie server URL dynamically |
 | `refgenie_get_url` | Check current server configuration and status |
-| `refgenie_list_genomes` | List all available genomes, optionally filtered by organism |
-| `refgenie_get_genome` | Get detailed information about a specific genome |
-| `refgenie_get_genome_digest` | Get the GA4GH sequence digest for a genome |
-| `refgenie_list_assets` | List all available assets for a specific genome |
-| `refgenie_get_asset` | Get detailed information about a specific genome asset |
+| `refgenie_list_genomes` | List all available genome digests |
+| `refgenie_get_genome` | Find genomes with aliases similar to the given alias using fuzzy matching |
+| `refgenie_get_genome_digest` | Get the sequence digest for a genome by alias |
+| `refgenie_list_assets` | List all available assets, optionally filtered by genome digest |
 | `refgenie_search_assets` | Find all genomes that have a specific asset type |
-| `refgenie_get_asset_path` | Get the download or access path for an asset (HTTP, S3, GCS, etc.) |
-| `refgenie_get_available_remotes` | List available remote storage systems on the server |
-| `refgenie_get_server_summary` | Get overall server statistics and information |
-| `refgenie_get_organism_genomes` | Get all genomes available for a specific organism |
-| `refgenie_compare_genomes` | Compare available assets between two genomes |
+| `refgenie_get_asset_path` | Get the download or access path for an asset (HTTP, S3, etc.) |
 
 
 ## License / Links
@@ -257,7 +252,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - https://github.com/ga4gh/tool-registry-service-schemas
   - https://github.com/ga4gh/refget
 
-- Refgenie: https://refgenie.databio.org
+- Other Specs
+  - Refgenie: https://refgenie.databio.org
 
 ## AI Disclosure
 
