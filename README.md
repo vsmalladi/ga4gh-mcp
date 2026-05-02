@@ -12,9 +12,9 @@ GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excel
 
 - **ga4gh-trs** - Provides direct access to GA4GH Tool Registry Service (TRS) endpoints, allowing you to discover and query tools, workflows, and their metadata.
 
-- **ga4gh-refget** - Retrieve and validate biological sequences and collections via GA4GH refget APIs. Supports digest computation, sequence lookup, and FASTA ingestion.
+- **ga4gh-refget** - Retrieve and validate biological sequences and collections via GA4GH refget APIs. Supports digest computation, sequence and collection lookup, and FASTA ingestion.
 
-- **refgenie** - Discover and access reference genome assets and annotations.
+- **refgenie** - Discover and access reference genome assets, annotations, and download paths from a refgenie server.
 
 
 ## Prerequisites
@@ -173,13 +173,9 @@ User: "Get me a list of RNAseq workflows from dockstore and group by language"
 AI: [calls ga4gh-trs] -> Search using terms RNA-seq and aliases -> Returns table of workflows matching search pattern broken up by workflow language and given number of versions for each
 ```
 
-```
-User: "Fetch sequence for this GA4GH digest"
-AI: [calls ga4gh-refget] -> 
-```
 
 ```
-User: "Find Human Reference Sequence"
+User: "Find Human Reference Sequence from https://api.refgenie.org/"
 AI: [calls refgenie] -> Search for all Human assets using aliases -> Returns a list of human references assets by id that match aliases 
 ```
 
@@ -229,18 +225,18 @@ Provides direct access to any GA4GH Refget endpoint discovering genomes.
 
 ### refgenie
 
-Discover and access reference genome assets and annotations from the refgenie database.
+Discover and access reference genome assets, aliases, and remote download paths from a refgenie server.
 
 | Tool | Description |
 |---|---|
-| `refgenie_set_url` | Configure refgenie server URL dynamically |
-| `refgenie_get_url` | Check current server configuration and status |
-| `refgenie_list_genomes` | List all available genome digests |
-| `refgenie_get_genome` | Find genomes with aliases similar to the given alias using fuzzy matching |
-| `refgenie_get_genome_digest` | Get the sequence digest for a genome by alias |
-| `refgenie_list_assets` | List all available assets, optionally filtered by genome digest |
-| `refgenie_search_assets` | Find all genomes that have a specific asset type |
-| `refgenie_get_asset_path` | Get the download or access path for an asset (HTTP, S3, etc.) |
+| `refgenie_set_url` | Configure or override the refgenie server URL for subsequent requests |
+| `refgenie_get_url` | Check the current refgenie server URL, connection status, and server info |
+| `refgenie_list_genomes` | List all available genome digests from the configured refgenie instance |
+| `refgenie_get_genome` | Find genomes by alias using fuzzy matching across known genome identifiers |
+| `refgenie_get_genome_digest` | Resolve a genome alias to its canonical genome digest |
+| `refgenie_list_assets` | List available assets for a genome digest, optionally including seek keys |
+| `refgenie_search_assets` | Search for genomes that carry a specific asset type |
+| `refgenie_get_asset_path` | Retrieve the asset access path or download URL, including remoteClass support for HTTP/S3 |
 
 
 ## License / Links

@@ -1,3 +1,5 @@
+import http
+
 from mcp.server.fastmcp import FastMCP
 import httpx
 import os
@@ -11,19 +13,19 @@ mcp = FastMCP("refgenie")
 # Constants
 USER_AGENT = "refgenie-mcp/1.0"
 # Get base URL from environment variable or use default
-BASE_URL = os.getenv("REFGENIE_URL", "http://refgenomes.databio.org")
+BASE_URL = os.getenv("REFGENIE_URL", http://refgenomes.databio.org/v3")
 # Timeout in seconds
 TIMEOUT = int(os.getenv("REFGENIE_TIMEOUT", "30"))
 CLIENT = httpx.AsyncClient(timeout=TIMEOUT)
 
 
 @mcp.tool()
-async def refgenie_set_url(url: str) -> dict:
+async def set_url(url: str) -> dict:
     """
     Set the refgenie server URL for subsequent requests.
     
     Args:
-        url: Base URL of the refgenie server (e.g., http://refgenomes.databio.org)
+        url: Base URL of the refgenie server (e.g., https://api.refgenie.org/v3)
     
     Returns:
         Confirmation message with the set URL
@@ -38,7 +40,7 @@ async def refgenie_set_url(url: str) -> dict:
 
 
 @mcp.tool()
-async def refgenie_get_url() -> dict:
+async def get_url() -> dict:
     """
     Get the current refgenie server URL and configuration.
     
@@ -67,7 +69,7 @@ async def refgenie_get_url() -> dict:
 
 
 @mcp.tool()
-async def refgenie_list_genomes() -> dict:
+async def list_genomes() -> dict:
     """
     List all available genomes digests on the refgenie server.
     
@@ -99,7 +101,7 @@ async def refgenie_list_genomes() -> dict:
 
 
 @mcp.tool()
-async def refgenie_get_genome(genome_alias: str) -> dict:
+async def get_genome(genome_alias: str) -> dict:
     """
     Get genome digests with aliases similar to the given genome alias.
     
@@ -181,7 +183,7 @@ async def refgenie_get_genome(genome_alias: str) -> dict:
 
 
 @mcp.tool()
-async def refgenie_get_genome_digest(genome_alias: str) -> dict:
+async def get_genome_digest(genome_alias: str) -> dict:
     """
     Get the digest for a genome by its alias.
     
@@ -227,7 +229,7 @@ async def refgenie_get_genome_digest(genome_alias: str) -> dict:
 
 
 @mcp.tool()
-async def refgenie_list_assets(genome_digest: Optional[str] = None, seek_key: bool = False) -> dict:
+async def list_assets(genome_digest: Optional[str] = None, seek_key: bool = False) -> dict:
     """
     List all available assets for a specific genome.
     
@@ -298,7 +300,7 @@ async def refgenie_list_assets(genome_digest: Optional[str] = None, seek_key: bo
 
 
 @mcp.tool()
-async def refgenie_search_assets(asset_name: str) -> dict:
+async def search_assets(asset_name: str) -> dict:
     """
     Search for all genomes that have a specific asset name.
     
@@ -340,7 +342,7 @@ async def refgenie_search_assets(asset_name: str) -> dict:
 
 
 @mcp.tool()
-async def refgenie_get_asset_path(genome_digest: str, asset_name: str, seek_key: str, tag: str = "default", remote: str = "http") -> dict:
+async def get_asset_path(genome_digest: str, asset_name: str, seek_key: str, tag: str = "default", remote: str = "http") -> dict:
     """
     Get the access path for an asset (local, HTTP, S3, etc.).
     
