@@ -13,7 +13,7 @@ mcp = FastMCP("refgenie")
 # Constants
 USER_AGENT = "refgenie-mcp/1.0"
 # Get base URL from environment variable or use default
-BASE_URL = os.getenv("REFGENIE_URL", http://refgenomes.databio.org/v3")
+BASE_URL = os.getenv("REFGENIE_URL", "http://refgenomes.databio.org/v3")
 # Timeout in seconds
 TIMEOUT = int(os.getenv("REFGENIE_TIMEOUT", "30"))
 CLIENT = httpx.AsyncClient(timeout=TIMEOUT)
