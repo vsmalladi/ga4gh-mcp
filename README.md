@@ -12,48 +12,48 @@ GA4GH-MCP bridges the gap between AI queries and GA4GH standards. While AI excel
 
 - **ga4gh-trs** - Provides direct access to GA4GH Tool Registry Service (TRS) endpoints, allowing you to discover and query tools, workflows, and their metadata.
 
-- **ga4gh-refget** - Retrieve and validate biological sequences and collections via GA4GH refget APIs. Supports digest computation, sequence lookup, and FASTA ingestion.
+- **ga4gh-refget** - Retrieve and validate biological sequences and collections via GA4GH refget APIs. Supports digest computation, sequence and collection lookup, and FASTA ingestion.
 
-- **refgenie** - Discover and access reference genome assets and annotations.
+- **refgenie** - Discover and access reference genome assets, annotations, and download paths from a refgenie server.
 
 ## Prerequisites
 
 - Python 3.10+
 - [uv](https://github.com/astral-sh/uv) - fast Python package manager and runner
 
-  ```bash
+```bash
   # Install uv if you haven't already
   curl -LsSf https://astral.sh/uv/install.sh | sh
-  ```
+```
 
 ## Setup
 
 1. Create and activate a virtual environment
 
-```bash
+   ```bash
    uv venv
    source .venv/bin/activate
-```
+   ```
 
-1. Install dependencies
+2. Install dependencies
 
-```bash
+   ```bash
    uv add "mcp[cli]" httpx
-```
+   ```
 
-1. Install nvm if you don't have it
+3. Install nvm if you don't have it
 
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
-# Restart terminal then install and use Node 20
-nvm install 20
-nvm use 20
-```
+   # Restart terminal then install and use Node 20
+   nvm install 20
+   nvm use 20
+   ```
 
 ## Running the servers
 
-1) Run directly with uv from project root
+Run directly with uv from project root:
 
 ```bash
 # run GA4GH registry server
@@ -67,7 +67,6 @@ uv run --directory servers -- python -m ga4gh_refget.py
 
 # run Refgenie server
 uv run --directory servers -- python -m refgenie.py
-
 ```
 
 ## Testing the server
@@ -78,16 +77,16 @@ Launch the inspector against a locally installed server:
 
 ```bash
 # GA4GH Registry server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-ga4gh-registry
+npx @modelcontextprotocol/inspector uv --directory . run ga4gh_registry.py
 
 # TRS server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-trs
+npx @modelcontextprotocol/inspector uv --directory . run ga4gh_trs.py
 
 # Refget server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-refget
+npx @modelcontextprotocol/inspector uv --directory . run ga4gh_refget.py
 
 # Refgenie server
-npx @modelcontextprotocol/inspector uv --directory . run fairbio-refgenie
+npx @modelcontextprotocol/inspector uv --directory . run refgenie.py
 ```
 
 Once running, the Inspector opens a browser UI where you can:
@@ -103,47 +102,47 @@ This is the recommended approach for iterative development: make a change, resta
 1. Ensure uv is installed on your system
 2. Example `claude_desktop_config.json` entry:
 
-```json
-"ga4gh-registry": {
-  "command": "uv",
-  "args": [
-    "--directory",
-    "ga4gh-mcp/servers",
-    "run",
-    "ga4gh_registry.py"
-  ]
-},
-"ga4gh-trs": {
-  "command": "uv",
-  "args": [
-     "--directory",
-    "ga4gh-mcp/servers",
-    "run",
-    "ga4gh_trs.py"
-  ]
-},
-"ga4gh-refget": {
-  "command": "uv",
-  "args": [
-     "--directory",
-    "ga4gh-mcp/servers",
-    "run",
-    "ga4gh_refget.py"
-  ]
-},
-"refgenie": {
-  "command": "uv",
-  "args": [
-     "--directory",
-    "ga4gh-mcp/servers",
-    "run",
-    "refgenie.py"
-  ]
-},
-```
+   ```json
+   "ga4gh-registry": {
+     "command": "uv",
+     "args": [
+       "--directory",
+       "ga4gh-mcp/server",
+       "run",
+       "ga4gh_registry.py"
+     ]
+   },
+   "ga4gh-trs": {
+     "command": "uv",
+     "args": [
+       "--directory",
+       "ga4gh-mcp/server",
+       "run",
+       "ga4gh_trs.py"
+     ]
+   },
+   "ga4gh-refget": {
+     "command": "uv",
+     "args": [
+       "--directory",
+       "ga4gh-mcp/server",
+       "run",
+       "ga4gh_refget.py"
+     ]
+   },
+   "refgenie": {
+     "command": "uv",
+     "args": [
+       "--directory",
+       "ga4gh-mcp/server",
+       "run",
+       "refgenie.py"
+     ]
+   },
+   ```
 
-1. Restart Claude Desktop (or use Help → Reload configuration)
-2. Servers should now appear in the Tools/Plugins list
+3. Restart Claude Desktop (or use Help → Reload configuration)
+4. Servers should now appear in the Tools/Plugins list
 
 ## Troubleshooting
 
@@ -230,23 +229,18 @@ Provides direct access to any GA4GH Refget endpoint discovering genomes.
 
 ### refgenie
 
-Discover and access reference genome assets and annotations from the refgenie database.
+Discover and access reference genome assets, aliases, and remote download paths from a refgenie server.
 
 | Tool | Description |
 | --- | --- |
-| `refgenie_set_url` | Configure refgenie server URL dynamically |
-| `refgenie_get_url` | Check current server configuration and status |
-| `refgenie_list_genomes` | List all available genomes, optionally filtered by organism |
-| `refgenie_get_genome` | Get detailed information about a specific genome |
-| `refgenie_get_genome_digest` | Get the GA4GH sequence digest for a genome |
-| `refgenie_list_assets` | List all available assets for a specific genome |
-| `refgenie_get_asset` | Get detailed information about a specific genome asset |
-| `refgenie_search_assets` | Find all genomes that have a specific asset type |
-| `refgenie_get_asset_path` | Get the download or access path for an asset (HTTP, S3, GCS, etc.) |
-| `refgenie_get_available_remotes` | List available remote storage systems on the server |
-| `refgenie_get_server_summary` | Get overall server statistics and information |
-| `refgenie_get_organism_genomes` | Get all genomes available for a specific organism |
-| `refgenie_compare_genomes` | Compare available assets between two genomes |
+| `refgenie_set_url` | Configure or override the refgenie server URL for subsequent requests |
+| `refgenie_get_url` | Check the current refgenie server URL, connection status, and server info |
+| `refgenie_list_genomes` | List all available genome digests from the configured refgenie instance |
+| `refgenie_get_genome` | Find genomes by alias using fuzzy matching across known genome identifiers |
+| `refgenie_get_genome_digest` | Resolve a genome alias to its canonical genome digest |
+| `refgenie_list_assets` | List available assets for a genome digest, optionally including seek keys |
+| `refgenie_search_assets` | Search for genomes that carry a specific asset type |
+| `refgenie_get_asset_path` | Retrieve the asset access path or download URL, including remoteClass support for HTTP/S3 |
 
 ## License / Links
 
@@ -257,7 +251,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - <https://github.com/ga4gh/tool-registry-service-schemas>
   - <https://github.com/ga4gh/refget>
 
-- Refgenie: <https://refgenie.databio.org>
+- Other Specs
+  - Refgenie: <https://refgenie.databio.org>
 
 ## AI Disclosure
 
