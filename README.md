@@ -233,14 +233,19 @@ Discover and access reference genome assets, aliases, and remote download paths 
 
 | Tool | Description |
 | --- | --- |
-| `refgenie_set_url` | Configure or override the refgenie server URL for subsequent requests |
-| `refgenie_get_url` | Check the current refgenie server URL, connection status, and server info |
-| `refgenie_list_genomes` | List all available genome digests from the configured refgenie instance |
-| `refgenie_get_genome` | Find genomes by alias using fuzzy matching across known genome identifiers |
-| `refgenie_get_genome_digest` | Resolve a genome alias to its canonical genome digest |
-| `refgenie_list_assets` | List available assets for a genome digest, optionally including seek keys |
-| `refgenie_search_assets` | Search for genomes that carry a specific asset type |
-| `refgenie_get_asset_path` | Retrieve the asset access path or download URL, including remoteClass support for HTTP/S3 |
+| `refgenie_set_url` | Configure refgenie server URL dynamically |
+| `refgenie_get_url` | Check current server configuration and status |
+| `refgenie_list_genomes` | List all available genomes, optionally filtered by organism |
+| `refgenie_get_genome` | Get detailed information about a specific genome |
+| `refgenie_get_genome_digest` | Get the GA4GH sequence digest for a genome |
+| `refgenie_list_assets` | List all available assets for a specific genome |
+| `refgenie_get_asset` | Get detailed information about a specific genome asset |
+| `refgenie_search_assets` | Find all genomes that have a specific asset type |
+| `refgenie_get_asset_path` | Get the download or access path for an asset (HTTP, S3, GCS, etc.) |
+| `refgenie_get_available_remotes` | List available remote storage systems on the server |
+| `refgenie_get_server_summary` | Get overall server statistics and information |
+| `refgenie_get_organism_genomes` | Get all genomes available for a specific organism |
+| `refgenie_compare_genomes` | Compare available assets between two genomes |
 
 ## License / Links
 
