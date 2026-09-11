@@ -60,13 +60,13 @@ Run directly with uv from project root:
 uv run --directory servers -- python -m ga4gh_registry
 
 # run TRS server
-uv run --directory servers -- python -m ga4gh_trs.py
+uv run --directory servers -- python -m ga4gh_trs
 
 # run Refget server
-uv run --directory servers -- python -m ga4gh_refget.py
+uv run --directory servers -- python -m ga4gh_refget
 
 # run Refgenie server
-uv run --directory servers -- python -m refgenie.py
+uv run --directory servers -- python -m refgenie
 ```
 
 ## Testing the server
@@ -138,11 +138,13 @@ This is the recommended approach for iterative development: make a change, resta
        "run",
        "refgenie.py"
      ]
-   },
+   }
    ```
 
 3. Restart Claude Desktop (or use Help → Reload configuration)
 4. Servers should now appear in the Tools/Plugins list
+
+Note: this works with Claude code as well, just tell it to import MCP servers from the `claude_desktop_config.json` above. It will fix up the formatting and after restarting, the servers will appear in `/mcp`
 
 ## Troubleshooting
 
